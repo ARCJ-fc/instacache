@@ -7,3 +7,4 @@ deploy:
   on:
     repo: ARCJ-fc/instacache
     on: master
+script: ./run_build.sh
