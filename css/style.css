@@ -1,0 +1,41 @@
+#tweetd {
+}
+
+.tweetContainer {
+	background: rgba(255, 255, 255, 0.35);
+	text-align: right;
+	border-style: solid;
+	border-width: 3px;
+	border-radius: 10px;
+	border-color: transparent;
+}
+
+.background {
+	position:absolute;
+	top: 0;
+	left: 0;
+	z-index: -5;
+}
+
+.bg {
+	background-size: cover;
+}
+
+#pictureGallery {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.gallery {
+	max-height: 25%;
+	z-index: 20;
+	display: inline-block;
+	margin: 10px 10px 10px 20px;
+}
+
+.imgContainer {
+	width: 16%;
+	height: 16%;
+	display: inline-block;
+}
