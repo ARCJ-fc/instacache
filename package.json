@@ -6,10 +6,6 @@
   "scripts": {
     "test": "node ./test/ | tape"
   }
-  repository: {
-    "type": "git",
-    //"url": github url //
-  },
   "author": "angela merkel",
   "license": "ISC",
   "dependencies": {
