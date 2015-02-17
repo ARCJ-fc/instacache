@@ -2,7 +2,7 @@ language: node_js
 deploy:
   provider: heroku
   api_key:
-    secure: Bvw6Esu8sFoG+SrdFxkOUZMSburl60YmqdMkR0MM8lS63Lrlb4fvmtL3LDlSoHVSilwSQ6RI+jywRKDMr3utr6Kn2fWwuIu304ywfN/brlVi/vju4+DQ85enVV+q+Kg8GbJTw+GleI4/H9spzMJqfTLBRwXI0ErupbedyTerCaY=
+    secure: iff7z2LzGgrAdulwMxbnzppHWqCWXcJUntshpWaBy3BzwIPlwRQcWzQe+/I4WIUS21IT6XOEFSfcwbJPTrWEBbnDqnl65p5xl1GeC8snwIMDJq6q7P9j77OnQws0ZY2FHTCQGDPKKYaBzXGclFoAMPP9LOrpeueBGYYa0dTPlmo=
   app: instacache
   on:
     repo: ARCJ-fc/instacache

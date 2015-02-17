@@ -4,7 +4,11 @@
   "description": "the big project for the week",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node ./test/ | tape"
+  }
+  repository: {
+    "type": "git",
+    //"url": github url //
   },
   "author": "angela merkel",
   "license": "ISC",
