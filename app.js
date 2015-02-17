@@ -25,6 +25,17 @@ io = require('socket.io')(server);
 
 
 
+// ******************************* \\
+// ***** Setting up security ***** \\
+var ct = process.env.consumer_key,
+    cs = process.env.consumer_secret,
+    atk = process.env.access_token_key,
+    ats = process.env.access_token_secret;
+// --- End setting up security --- \\
+// ------------------------------- \\
+
+
+
 // ********************************************************** //
 // *** Setting up how the server treats incoming requests *** //
 // Loading index.html when a user connects to the server
@@ -78,11 +89,13 @@ function getFile (filePath, res, page404, mimeType) {
 // ***************************************************************** //
 // *** Setting up variables for the twit stream to el cliento si *** //
 twit = new Twitter({
-    consumer_key: 'U8N2QzFu6Hv4BB3BjObIy9HDF',
-    consumer_secret: 'rJWtj5NneVWmfT8STB7YN6IBkLreke9JoJhP3nIe0ffnBq91Xv',
-    access_token_key: '2389016353-4tCDaVgRFkkNsWOj1sb6fZQ8s0bINqD5jJGmqRC',
-    access_token_secret: 'OEFnemh9FlSkOX5YuNP46XsDh3EutbHiiKq6q8wV2Pwko'
+    consumer_key: ct || require("./confidential").ct,
+    consumer_secret: cs || require("./confidential").cs,
+    access_token_key: atk || require("./confidential").atk,
+    access_token_secret: ats || require("./confidential").ats
 }); 
+    // console.log(ct);
+    // console.log(require("./confidential").ct);
 
 ig.use({ 
     client_id: 'd239fb3eff6c49fcaa1e35311e0fd2f1',
@@ -94,19 +107,17 @@ ig.use({
 
 // ************************************* \\
 // *** Setting up the twitter stream *** \\
-/*
+
 type = "statuses/filter",
 twitArray = [],
 trackParam = "foundersandcoders";
 twit.stream(type, {track: trackParam}, function(stream) {
   stream.on("data", function(tweet) {
-
     myObj = {
         name: tweet.user.name,
         status: tweet.text,
-        profileimg: tweet.user.profile_image_url,
-        twitpic: 
-    };
+        profileimg: tweet.user.profile_image_url
+    }
 
     twitArray.unshift(myObj);
     
@@ -115,14 +126,13 @@ twit.stream(type, {track: trackParam}, function(stream) {
     }
 
     io.sockets.emit("tweet", myObj)
-    console.log(tweet.text);
   });
  
   stream.on("error", function(error) {
     throw error;
   });
 });
-*/
+
 // --- End setup of twitter stream --- \\
 // ----------------------------------- \\
 
@@ -132,7 +142,7 @@ twit.stream(type, {track: trackParam}, function(stream) {
 searchTerm = "search/tweets/",
 searchParam = { q : "rihanna" },
 twit.get(searchTerm, searchParam, function(error, tweets, response){
-    console.log(tweets);
+    // console.log(tweets);
 });
 // -- End setup of the twitter request -- \\
 // -------------------------------------- \\
@@ -140,23 +150,23 @@ twit.get(searchTerm, searchParam, function(error, tweets, response){
 
 // ************************************* \\
 // *** Setting up the #insta request *** \\
-/*
-igObj = {
-    expiryDate: new Date()
-    igArray: []    
-},
-igTerm = data;
+function instaProcess(data) {
 
-ig.tag_media_recent(igTerm, function(err, medias, pagination, remaining, limit) {
-    for (var i = 0; i < 20; i++) {
-        var temp = medias[i].images.standard_resolution.url
-        igObj.igArray.unshift(temp);
-    }
-    io.emit("instaInc", "Incoming instas");
-    io.emit("instaPics", igArray);    
+    igObj = {
+        expiryDate: new Date(),
+        igArray: []    
+    },
+    igTerm = data;
+
+    ig.tag_media_recent(igTerm, function(err, medias, pagination, remaining, limit) {
+        for (var i = 0; i < 20; i++) {
+            var temp = medias[i].images.standard_resolution.url
+            igObj.igArray.unshift(temp);
+        }
+        io.emit("instaInc", "Incoming instas");
+        io.emit("instaPics", igArray);    
     })
-};
-*/
+}
 // function instaCache(date) {
 //     // check here for cached version expiry
 // }
@@ -171,8 +181,8 @@ io.on("connection", function (socket) {
     console.log("Connected");
     socket.emit("FreshTweets", twitArray);
     socket.on("insta", function(data) {
-        instaCache(data.requestDate)
-        // instaProcess(data.textBox)
+        // instaCache(data.requestDate)
+        instaProcess(data.textBox)
     })
     socket.on("twitGet", function(data) {
         var searchTerm = data.term;
