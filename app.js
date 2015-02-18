@@ -97,6 +97,7 @@ twit = new Twitter({
     access_token_key: twit_atk || require("./confidential").atk,
     access_token_secret: twit_ats || require("./confidential").ats
 }); 
+console.log(twit.options.consumer_key);
 
 ig.use({ 
     client_id: insta_ci || require("./confidential").ci,
@@ -111,9 +112,10 @@ ig.use({
 
 type = "statuses/filter",
 twitArray = [],
-trackParam = "foundersandcoders";
+trackParam = "javascript";
 twit.stream(type, {track: trackParam}, function(stream) {
   stream.on("data", function(tweet) {
+    console.log("New tweet", tweet);
     myObj = {
         name: tweet.user.name,
         status: tweet.text,
@@ -183,6 +185,7 @@ io.on("connection", function (socket) {
     socket.emit("FreshTweets", twitArray);
     socket.on("insta", function(data) {
         // instaCache(data.requestDate)
+        console.log(data);
         instaProcess(data.textBox)
     })
     socket.on("twitGet", function(data) {

@@ -11,7 +11,7 @@
 
 <body>
 <div class="background" id="instad">
-	<img class='bg' src="http://foundersandcoders.org/img/old-mile-end-dark.jpeg">
+	<img class='bg'>
 </div>
 	<div class="col-md-7" id="instaGallery">
 		<div class="input-group">
@@ -24,7 +24,7 @@
     <div id="pictureGallery"></div>
 	<div class="col-md-5" id="tweetd"></div>
 
-<script type="text/javascript" src="/js/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -79,8 +79,7 @@
             requestDate: new Date(),
             textBox: $("#selection").val()    
         }
-    	
-    	console.log(textBox);
+    	console.log(requestObj.textBox);
     	socket.emit("insta", requestObj);
     	console.log("request sent")
     })
