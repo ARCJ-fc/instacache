@@ -40,7 +40,6 @@ var twit_ct = process.env.consumer_key,
 
 // ********************************************************** //
 // *** Setting up how the server treats incoming requests *** //
-// Loading index.html when a user connects to the server
 function myHandler (req, res) {
     var
     content = "",
@@ -49,7 +48,7 @@ function myHandler (req, res) {
     localFolder = __dirname + "/",
     page404 = localFolder + "404page.html";
 
-    exitChecker((localFolder + fileName), res, page404, extensions[ext]);
+    existChecker((localFolder + fileName), res, page404, extensions[ext]);
 
     if(!extensions[ext]){
         res.writeHead(404, {'Content-Type': 'text/html'});
@@ -180,12 +179,13 @@ function instaProcess(data) {
         io.emit("instaPics", igObj.igArray);    
     })
 }
+
 // function instaCache(date) {
 //     // check here for cached version expiry
 // }
-
 // ---- End setup of #insta request ---- \\
 // ------------------------------------ \\
+
 
 
 // *************************** \\
@@ -204,6 +204,8 @@ io.on("connection", function (socket) {
 });
 // --- End socket.io stuff --- \\
 // --------------------------- \\
+
+
 
 // *************************************** //
 // *** Starting up the server and ting *** //
