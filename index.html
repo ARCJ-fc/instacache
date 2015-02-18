@@ -1,8 +1,89 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<title> waiting to serve some twits </title>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
 </head>
+
 <body>
-hello m80s how r u
+<div class="background" id="instad">
+	<img class='bg'>
+</div>
+	<div class="col-md-7" id="instaGallery">
+		<div class="input-group">
+	      <input type="text" class="form-control" id="selection" placeholder="Instasearch">
+	      <span class="input-group-btn">
+        <button class="btn btn-default" id="instaButton" type="button">Go!</button>
+      </span>
+    </div>
+	</div>
+    <div id="pictureGallery"></div>
+	<div class="col-md-5" id="tweetd"></div>
+
+<script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var textBox,
+		myTwitterNumber,
+		myInstaNumber,
+		tweetNum,
+		tweetArray,
+		pictureGallery,
+        requestObj,
+		statusList,
+		$newTweet,
+		socket = io.connect('http://localhost:7500'),
+		// socket = io.connect('https://theinstacache.herokuapp.com/', {secure: true}),
+		myNumber = 5;
+
+
+	socket.on("FreshTweets", function(data) {
+		statusList = "";
+		console.log(data);
+		tweetArray = data;
+		tweetNum = tweetArray.length;
+		for (var i = 0; i < tweetNum; i++) {
+    		statusList += "<div class='tweetContainer'><h5>" + tweetArray[i].name + "<img src='" + tweetArray[i].profileimg + "'></h5><p>" + tweetArray[i].status + "</p></div>";
+    	}
+		$("#tweetd").prepend(statusList);
+	})
+
+    socket.on("tweet", function(data) {
+    	$newTweet = "<div class='tweetContainer'><h5><img src='" + data.profileimg + "'>" + data.name + "<h5><p>" + data.status + "</p></div>";
+    	$($newTweet).prependTo($("#tweetd"));
+    	tweetNum++
+    	if (tweetNum > myNumber) {
+    		$( ".tweetContainer" ).last().remove();
+    	}
+    });
+
+    socket.on("instaPics", function(data) {
+    	pictureGallery = "";
+    	for (var i = 0; i < 9; i++) {
+    		pictureGallery += "<div class='imgContainer'><img class='gallery' src='" + data[i] + "'></div>";
+    	}
+    	$("#instaGallery").append(pictureGallery);
+    })
+
+    socket.on("instaInc", function(data) {
+        console.log(data);
+    })
+
+    $("#instaButton").on("click", function(){
+        requestObj = {
+            requestDate: new Date(),
+            textBox: $("#selection").val()    
+        }
+    	console.log(requestObj.textBox);
+    	socket.emit("picsPlease", requestObj);
+    	console.log("request sent")
+    })
+
+</script>
 </body>
 </html>
