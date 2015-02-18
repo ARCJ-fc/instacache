@@ -49,7 +49,7 @@ function myHandler (req, res) {
     localFolder = __dirname + "/",
     page404 = localFolder + "404page.html";
 
-    exitChecker((localFolder + fileName), res, page404, extensions[ext]);
+    existChecker((localFolder + fileName), res, page404, extensions[ext]);
 
     if(!extensions[ext]){
         res.writeHead(404, {'Content-Type': 'text/html'});
