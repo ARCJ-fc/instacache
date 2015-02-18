@@ -1,6 +1,6 @@
 // ***************************************************************** //
 // ***** Initializing & declaring variables, requiring modules ***** //
-var arr, extensions, fs, http, ig, igArray, io, myObj, myPort, path, twit, twitArray, server, trackParam, Twitter, type;
+var arr, extensions, fs, http, ig, igArray, io, myObj, myPort, path, twit, twArray, twitArray, server, searchTerm, trackParam, Twitter, type;
 
 extensions = {
   ".html" : "text/html",
@@ -27,12 +27,12 @@ io = require('socket.io')(server);
 
 // ******************************* \\
 // ***** Setting up security ***** \\
-var twit_ct = process.env.consumer_key,
-    twit_cs = process.env.consumer_secret,
-    twit_atk = process.env.access_token_key,
-    twit_ats = process.env.access_token_secret,
-    insta_ci = process.env.client_id,
-    insta_cs = process.env.client_secret;
+// var twit_ct = process.env.consumer_key,
+//     twit_cs = process.env.consumer_secret,
+//     twit_atk = process.env.access_token_key,
+//     twit_ats = process.env.access_token_secret,
+//     insta_ci = process.env.client_id,
+//     insta_cs = process.env.client_secret;
 // --- End setting up security --- \\
 // ------------------------------- \\
 
@@ -48,11 +48,11 @@ function myHandler (req, res) {
     localFolder = __dirname + "/",
     page404 = localFolder + "404page.html";
 
-    existChecker((localFolder + fileName), res, page404, extensions[ext]);
-
     if(!extensions[ext]){
         res.writeHead(404, {'Content-Type': 'text/html'});
         res.end("<html><head></head><body>The requested file type is not supported</body></html>");
+    } else {
+        existChecker((localFolder + fileName), res, page404, extensions[ext])
     };
 };
 
@@ -123,7 +123,7 @@ twitArray = [],
 trackParam = "javascript";
 twit.stream(type, {track: trackParam}, function(stream) {
   stream.on("data", function(tweet) {
-    console.log("New tweet", tweet);
+
     myObj = {
         name: tweet.user.name,
         status: tweet.text,
@@ -150,11 +150,28 @@ twit.stream(type, {track: trackParam}, function(stream) {
 
 // ************************************** \\
 // *** Setting up the twitter request *** \\
-searchTerm = "search/tweets/",
-searchParam = { q : "rihanna" },
-twit.get(searchTerm, searchParam, function(error, tweets, response){
-    // console.log(tweets);
-});
+function twitterRequest(data) {
+    twitObj = {
+        expiryDate: new Date(),
+        twArray: []
+    }
+    searchType = "search/tweets/";
+    // console.log("twitterRequest data:" + data);
+    twit.get(searchType, { q : data }, twitterProcess)
+}
+
+function twitterProcess(error, tweets, response) {
+    var temp;
+    // console.log(response)
+    // console.log(response.statuses[1])
+    // console.log("twitterProcess:" + tweets);
+    // console.log("twitterProcess:" + response); 
+    for (var i = 0; i < 20; i++) {
+        temp = response.statuses[i].entities.images;
+        twitObj.twArray.unshift(temp);
+    }
+    dataEmitter("instaPics", twitObj.twArray) 
+}
 // -- End setup of the twitter request -- \\
 // -------------------------------------- \\
 
@@ -162,24 +179,24 @@ twit.get(searchTerm, searchParam, function(error, tweets, response){
 
 // ************************************* \\
 // *** Setting up the #insta request *** \\
-function instaProcess(data) {
-
+function instaRequest(data) {
     igObj = {
         expiryDate: new Date(),
         igArray: []    
-    },
-    igTerm = data;
-
-    ig.tag_media_recent(igTerm, function(err, medias, pagination, remaining, limit) {
-        for (var i = 0; i < 20; i++) {
-            var temp = medias[i].images.standard_resolution.url
-            igObj.igArray.unshift(temp);
-        }
-        io.emit("instaInc", "Incoming instas");
-        io.emit("instaPics", igObj.igArray);    
-    })
+    };
+    // console.log("instaRequest:" + data);
+    ig.tag_media_recent(data, instaProcess);
 }
 
+function instaProcess(err, medias, pagination, remaining, limit) {
+    // console.log("instaProcess");
+    var temp;
+    for (var i = 0; i < 20; i++) {
+        temp = medias[i].images.standard_resolution.url;
+        igObj.igArray.unshift(temp);
+    }
+    dataEmitter("instaPics", igObj.igArray)    
+}
 // function instaCache(date) {
 //     // check here for cached version expiry
 // }
@@ -193,15 +210,18 @@ function instaProcess(data) {
 io.on("connection", function (socket) {
     console.log("Connected");
     socket.emit("FreshTweets", twitArray);
-    socket.on("insta", function(data) {
+    socket.on("picsPlease", function(data) {
         // instaCache(data.requestDate)
-        console.log(data);
-        instaProcess(data.textBox)
-    })
-    socket.on("twitGet", function(data) {
-        var searchTerm = data.term;
+        searchTerm = data.textBox;
+        twitterRequest(searchTerm);
+        instaRequest(searchTerm)
     })
 });
+
+function dataEmitter(type, contents) {
+    io.emit("message", "Incoming" + type);
+    io.emit(type, contents);
+}
 // --- End socket.io stuff --- \\
 // --------------------------- \\
 

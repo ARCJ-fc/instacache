@@ -37,8 +37,8 @@
         requestObj,
 		statusList,
 		$newTweet,
-		
-		socket = io.connect('https://theinstacache.herokuapp.com/', {secure: true}),
+		socket = io.connect('http://localhost:7500'),
+		// socket = io.connect('https://theinstacache.herokuapp.com/', {secure: true}),
 		myNumber = 5;
 
 
@@ -80,7 +80,7 @@
             textBox: $("#selection").val()    
         }
     	console.log(requestObj.textBox);
-    	socket.emit("insta", requestObj);
+    	socket.emit("picsPlease", requestObj);
     	console.log("request sent")
     })
 
