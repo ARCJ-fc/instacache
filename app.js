@@ -48,8 +48,6 @@ function myHandler (req, res) {
     localFolder = __dirname + "/",
     page404 = localFolder + "404page.html";
 
-    existChecker((localFolder + fileName), res, page404, extensions[ext]);
-
     if(!extensions[ext]){
         res.writeHead(404, {'Content-Type': 'text/html'});
         res.end("<html><head></head><body>The requested file type is not supported</body></html>");
