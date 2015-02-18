@@ -49,7 +49,7 @@ function myHandler (req, res) {
     localFolder = __dirname + "/",
     page404 = localFolder + "404page.html";
 
-    getFile((localFolder + fileName), res, page404, extensions[ext]);
+    exitChecker((localFolder + fileName), res, page404, extensions[ext]);
 
     if(!extensions[ext]){
         res.writeHead(404, {'Content-Type': 'text/html'});
@@ -58,19 +58,24 @@ function myHandler (req, res) {
 };
 
 function getFile (filePath, res, page404, mimeType) {
+    fs.readFile(filePath, function(err, contents) {
+        if(!err) {
+            res.writeHead(200, {
+                "Content-type" : mimeType,
+                "Content-Length" : contents.length
+            });
+            res.end(contents);
+        } else {
+            console.dir(err);
+        }
+    })
+};
+
+
+function existChecker (filePath, res, page404, mimeType) {
     fs.exists(filePath, function(exists) {
         if(exists) {
-            fs.readFile(filePath, function(err, contents) {
-                if(!err) {
-                    res.writeHead(200, {
-                        "Content-type" : mimeType,
-                        "Content-Length" : contents.length
-                    });
-                    res.end(contents);
-                } else {
-                    console.dir(err);
-                }
-            })
+            getFile(filePath, res, page404, mimeType)
         } else {
             fs.readFile(page404, function(err, contents) {
                 if(!err) { 
@@ -82,7 +87,7 @@ function getFile (filePath, res, page404, mimeType) {
             })
         }
     })
-};
+}
 // --- End setup for server treatment of incoming requests --- //
 // ----------------------------------------------------------- //
 
@@ -172,7 +177,7 @@ function instaProcess(data) {
             igObj.igArray.unshift(temp);
         }
         io.emit("instaInc", "Incoming instas");
-        io.emit("instaPics", igArray);    
+        io.emit("instaPics", igObj.igArray);    
     })
 }
 // function instaCache(date) {
