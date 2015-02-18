@@ -33,7 +33,6 @@ var twit_ct = process.env.consumer_key,
     twit_ats = process.env.access_token_secret,
     insta_ci = process.env.client_id,
     insta_cs = process.env.client_secret;
-
 // --- End setting up security --- \\
 // ------------------------------- \\
 
@@ -92,24 +91,29 @@ function getFile (filePath, res, page404, mimeType) {
 // ***************************************************************** //
 // *** Setting up variables for the twit stream to el cliento si *** //
 twit = new Twitter({
-    consumer_key: twit_ct || require("./confidential").ct,
-    consumer_secret: twit_cs || require("./confidential").cs,
-    access_token_key: twit_atk || require("./confidential").atk,
-    access_token_secret: twit_ats || require("./confidential").ats
+    consumer_key: 'U8N2QzFu6Hv4BB3BjObIy9HDF',
+    // twit_ct || require("./confidential").ct,
+    consumer_secret: 'rJWtj5NneVWmfT8STB7YN6IBkLreke9JoJhP3nIe0ffnBq91Xv',
+    // twit_cs || require("./confidential").cs,
+    access_token_key: '2389016353-4tCDaVgRFkkNsWOj1sb6fZQ8s0bINqD5jJGmqRC',
+    // twit_atk || require("./confidential").atk,
+    access_token_secret: 'OEFnemh9FlSkOX5YuNP46XsDh3EutbHiiKq6q8wV2Pwko'
+    // twit_ats || require("./confidential").ats
 }); 
-console.log(twit.options.consumer_key);
 
 ig.use({ 
-    client_id: insta_ci || require("./confidential").ci,
-    client_secret: insta_cs || require("./confidential").cs
+    client_id: 'd239fb3eff6c49fcaa1e35311e0fd2f1',
+    // insta_ci || require("./confidential").ci,
+    client_secret: 'c0be3eef8a8047e79b403773c9824797'
+    // insta_cs || require("./confidential").cs
 });
 // --- End la setupa de la variablo del twit stream al clientissimo --- //
 // -------------------------------------------------------------------- //
 
 
+
 // ************************************* \\
 // *** Setting up the twitter stream *** \\
-
 type = "statuses/filter",
 twitArray = [],
 trackParam = "javascript";
@@ -135,9 +139,9 @@ twit.stream(type, {track: trackParam}, function(stream) {
     throw error;
   });
 });
-
 // --- End setup of twitter stream --- \\
 // ----------------------------------- \\
+
 
 
 // ************************************** \\
@@ -149,6 +153,7 @@ twit.get(searchTerm, searchParam, function(error, tweets, response){
 });
 // -- End setup of the twitter request -- \\
 // -------------------------------------- \\
+
 
 
 // ************************************* \\
