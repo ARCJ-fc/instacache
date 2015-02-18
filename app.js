@@ -27,10 +27,13 @@ io = require('socket.io')(server);
 
 // ******************************* \\
 // ***** Setting up security ***** \\
-var ct = process.env.consumer_key,
-    cs = process.env.consumer_secret,
-    atk = process.env.access_token_key,
-    ats = process.env.access_token_secret;
+var twit_ct = process.env.consumer_key,
+    twit_cs = process.env.consumer_secret,
+    twit_atk = process.env.access_token_key,
+    twit_ats = process.env.access_token_secret,
+    insta_ci = process.env.client_id,
+    insta_cs = process.env.client_secret;
+
 // --- End setting up security --- \\
 // ------------------------------- \\
 
@@ -89,17 +92,15 @@ function getFile (filePath, res, page404, mimeType) {
 // ***************************************************************** //
 // *** Setting up variables for the twit stream to el cliento si *** //
 twit = new Twitter({
-    consumer_key: ct || require("./confidential").ct,
-    consumer_secret: cs || require("./confidential").cs,
-    access_token_key: atk || require("./confidential").atk,
-    access_token_secret: ats || require("./confidential").ats
+    consumer_key: twit_ct || require("./confidential").ct,
+    consumer_secret: twit_cs || require("./confidential").cs,
+    access_token_key: twit_atk || require("./confidential").atk,
+    access_token_secret: twit_ats || require("./confidential").ats
 }); 
-    // console.log(ct);
-    // console.log(require("./confidential").ct);
 
 ig.use({ 
-    client_id: 'd239fb3eff6c49fcaa1e35311e0fd2f1',
-    client_secret: 'c0be3eef8a8047e79b403773c9824797'
+    client_id: insta_ci || require("./confidential").ci,
+    client_secret: insta_cs || require("./confidential").cs
 });
 // --- End la setupa de la variablo del twit stream al clientissimo --- //
 // -------------------------------------------------------------------- //
