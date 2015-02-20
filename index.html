@@ -62,6 +62,7 @@
     });
 
     socket.on("twitPics", function(data) {
+        console.log(data);
     	pictureGallery = "";
     	for (var i = 0; i < data.length; i++) {
     		pictureGallery += "<div class='imgContainer'><img href='" + data[i].link + "' class='gallery' src='" + data[i].pic + "'></div>";
@@ -70,6 +71,7 @@
     });
 
     socket.on("instaPics", function(data) {
+        console.log(data);
         pictureGallery = "";
         for (var i = 0; i < data.length; i++) {
             pictureGallery += "<div class='imgContainer'><img href='" + data[i].link + "' class='gallery' src='" + data[i].pic + "'></div>";
@@ -77,13 +79,21 @@
         $("#instaGallery").append(pictureGallery);
     })
 
-    // socket.on("message", function(data) {
-    //     console.log(data);
-    // })
+    socket.on("cachedPics", function(data) {
+        console.log(data.twArray);
+        pictureGallery = "";
+        for (var i = 0; i < data.twArray.length; i++) {
+            pictureGallery += "<div class='imgContainer'><img href='" + data.twArray[i].link + "' class='gallery' src='" + data.twArray[i].pic + "'></div>";
+        }
+        $("#instaGallery").append(pictureGallery);
+    })
+
+    socket.on("message", function(data) {
+        console.log(data);
+    })
 
     $("#instaButton").on("click", function(){
         requestObj = {
-            requestDate: new Date(),
             textBox: $("#selection").val()    
         }
     	console.log(requestObj.textBox);
