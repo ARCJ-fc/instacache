@@ -265,6 +265,8 @@ console.log("Http server running on port" + " " + myPort);
 // ------- Here endeth the server ------- //
 // -------------------------------------- //
 
+exports.twitSearchCreator = twitSearchCreator;
+
 
 // ************************************* \\
 // *** Setting up the twitter stream *** \\
