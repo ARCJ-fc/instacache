@@ -13,16 +13,15 @@
 <div class="background" id="instad">
 	<img class='bg'>
 </div>
-	<div class="col-md-7" id="instaGallery">
+	<div class="col-md-12" id="instaGallery">
 		<div class="input-group">
-	      <input type="text" class="form-control" id="selection" placeholder="Instasearch">
-	      <span class="input-group-btn">
-        <button class="btn btn-default" id="instaButton" type="button">Go!</button>
-      </span>
-    </div>
+    	      <input type="text" class="form-control" id="selection" placeholder="Instasearch">
+    	      <span class="input-group-btn">
+            <button class="btn btn-default" id="instaButton" type="button">Go!</button>
+          </span>
+        </div>
 	</div>
     <div id="pictureGallery"></div>
-	<div class="col-md-5" id="tweetd"></div>
 
 <script type="text/javascript" src="/js/jquery-1.11.2.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
@@ -38,7 +37,7 @@
 		statusList,
 		$newTweet,
 		socket = io.connect('http://localhost:7500'),
-		// socket = io.connect('https://theinstacache.herokuapp.com/', {secure: true}),
+		//s ocket = io.connect('https://theinstacache.herokuapp.com/', {secure: true}),
 		myNumber = 5;
 
 
@@ -62,17 +61,25 @@
     	}
     });
 
-    socket.on("instaPics", function(data) {
+    socket.on("twitPics", function(data) {
     	pictureGallery = "";
-    	for (var i = 0; i < 9; i++) {
-    		pictureGallery += "<div class='imgContainer'><img class='gallery' src='" + data[i] + "'></div>";
+    	for (var i = 0; i < data.length; i++) {
+    		pictureGallery += "<div class='imgContainer'><img href='" + data[i].link + "' class='gallery' src='" + data[i].pic + "'></div>";
     	}
     	$("#instaGallery").append(pictureGallery);
+    });
+
+    socket.on("instaPics", function(data) {
+        pictureGallery = "";
+        for (var i = 0; i < data.length; i++) {
+            pictureGallery += "<div class='imgContainer'><img href='" + data[i].link + "' class='gallery' src='" + data[i].pic + "'></div>";
+        }
+        $("#instaGallery").append(pictureGallery);
     })
 
-    socket.on("instaInc", function(data) {
-        console.log(data);
-    })
+    // socket.on("message", function(data) {
+    //     console.log(data);
+    // })
 
     $("#instaButton").on("click", function(){
         requestObj = {
