@@ -19,7 +19,15 @@ test("twitSearchCreator tests", function(t) {
 	t.end()
 });
 
-
+// function testCallback(param){
+//     return param;
+// }
+// test('instaRequest tests', function(t){
+//     var data = 'this is a test string';
+//     var x = app.instaRequest(data, testCallback);
+//     t.equal(x, 'this_is_a_test_string', 'string should be returned url-ified');
+//     t.end();
+// });
 // test("twitterRequest should pass three parameters to a callback", function(t) {
 // 	function testCallback(a, b, c) {
 // 		var testParam = { 
