@@ -1,6 +1,6 @@
 // ***************************************************************** //
 // ***** Initializing & declaring variables, requiring modules ***** //
-var arr, currentSearch, db, extensions, fs, http, ig, igArray, keys, io, mongojs, myObj, myPort, Obj, path, twit, twArray, twitArray, searched, server, searchTerm, trackParam, Twitter, type;
+var arr, currentSearch, db, extensions, fs, http, ig, igArray, keys, io, mongojs, myObj, myPort, Obj, path, toggle, twit, twArray, twitArray, searched, server, searchTerm, trackParam, Twitter, type;
 
 extensions = {
   ".html" : "text/html",
@@ -21,6 +21,7 @@ searched = [],
 keys = require("./confidential"),
 mongojs = require("mongojs"),
 server = http.createServer(myHandler),
+toggle = 0,
 io = require('socket.io')(server),
 urlify = require('urlify').create(),
 
@@ -60,6 +61,7 @@ function alreadySearched(searchterm) {
         // if it is, pass the searchterm to the retriever function
         dbRetriever(searchterm, "tweetImages");
     } else {
+        toggle = 1;
         searched.push(searchterm);
         console.log("Pushed" + " " + searchterm + " to searched array");
     }
@@ -80,8 +82,11 @@ function dbWriter(data) {
     var dbDate = data.expiryDate,
         newDate = Obj.expiryDate;
         console.log("dbWriter", dbDate, newDate);
-    if (newDate > dbDate) {
+    if (toggle === 0 && newDate > dbDate) {
         db["tweetImages"].update({name: data.name}, Obj);
+    } else if (toggle === 1) {
+        db["tweetImages"].insert(Obj);
+        toggle = 0;
     }
 }
 //
@@ -195,7 +200,8 @@ function twitterProcess(error, tweets, response) {
         }
         Obj.twArray.unshift(temp);
     }
-    dataEmitter("twitPics", Obj.twArray)
+    dataEmitter("twitPics", Obj.twArray);
+    console.log(currentSearch);
     dbWriter(currentSearch); 
 }
 // -- End setup of the twitter request -- \\
