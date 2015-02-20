@@ -81,7 +81,7 @@ function dbWriter(data) {
         newDate = Obj.expiryDate;
         console.log("dbWriter", dbDate, newDate);
     if (newDate > dbDate) {
-        db["tweetImages"].insert(Obj);
+        db["tweetImages"].update({name: data.name}, Obj);
     }
 }
 //
@@ -266,6 +266,7 @@ console.log("Http server running on port" + " " + myPort);
 // -------------------------------------- //
 
 exports.twitSearchCreator = twitSearchCreator;
+exports.instaRequest = instaRequest;
 
 
 // ************************************* \\
