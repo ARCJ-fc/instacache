@@ -7,7 +7,7 @@ The instagram project of the ARC-J team.
 * Testing using Tap and Tape
 * Travis
 * Gulp
-* LevelDB
+* LevelDB/MongoDB
 * Pre-commit hooks or JSHint
 * Code Climate (static analysis)- aim from at least a score of 3.5
 * Heroku
