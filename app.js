@@ -1,6 +1,6 @@
 // ***************************************************************** //
 // ***** Initializing & declaring variables, requiring modules ***** //
-var arr, db, extensions, fs, http, ig, igArray, keys, io, mongojs, myObj, myPort, path, twit, twArray, twitArray, server, searchTerm, trackParam, Twitter, type;
+var arr, currentSearch, db, extensions, fs, http, ig, igArray, keys, io, mongojs, myObj, myPort, Obj, path, twit, twArray, twitArray, searched, server, searchTerm, trackParam, Twitter, type;
 
 extensions = {
   ".html" : "text/html",
@@ -17,28 +17,15 @@ path = require("path"),
 Twitter = require("twitter"),
 ig = require('instagram-node').instagram(),
 arr = [],
+searched = [],
 keys = require("./confidential"),
 mongojs = require("mongojs"),
 server = http.createServer(myHandler),
 io = require('socket.io')(server),
 urlify = require('urlify').create(),
 
-db = mongojs("mongodb://" + keys.mongoUserName + ":" + keys.mongoPassword + "@ds039251.mongolab.com:39251/mongosandcoders", ["tweetImages", "instaImages"]);
-
-//d b["tweetImages"].insert(twitObj);
-// db["instaImages"].insert(igObj);
-
-// db.getCollectionNames(function(err, collections) {
-//     console.log(collections["tweetImages"]);
-// })
-// db.tweetImages.find(function(err, docs) {
-//     console.log(docs[0].dog);
-// });
-// db.instaImages.find(function(err, docs) {
-    
-// })
-console.log(["tweetImages"].twitObj.expiryDate);
-db["instaImages"].igObj.expiryDate
+db = mongojs("mongodb://" + keys.mongoUserName + ":" + keys.mongoPassword + "@ds039251.mongolab.com:39251/mongosandcoders", ["tweetImages"]);
+initialCheck("tweetImages");
 // --- End initializing & declaring variables, requiring modules --- //
 // ----------------------------------------------------------------- //
 
@@ -55,6 +42,49 @@ db["instaImages"].igObj.expiryDate
 // ------------------------------- \\
 
 
+// 
+// *** Database manipulation \\
+function initialCheck(collection) {
+    db[collection].find(function(err, docs){
+        docs.map(function(ele) {
+            searched.push(ele.name);
+        })
+    })
+}
+
+// first check whether the searchterm is within our array of already searched terms
+function alreadySearched(searchterm) {
+    // 
+    if (searched.indexOf(searchterm) !== -1) {
+        console.log("searchterm found in array")
+        // if it is, pass the searchterm to the retriever function
+        dbRetriever(searchterm, "tweetImages");
+    } else {
+        searched.push(searchterm);
+        console.log("Pushed" + " " + searchterm + " to searched array");
+    }
+}
+
+// search the collection for an object with the 'name' property matching the searchTerm and return it
+function dbRetriever(searchterm, collection) {
+    // find the object in the collection
+    db[collection].find({name: searchterm}, function(err, docs) {
+        currentSearch = docs[0];
+        dataEmitter("cachedPics", currentSearch);
+    });
+};
+
+// after getting the api response back, check the date of the request against the date of the DB version.
+// if the db code has expired, write to it. 
+function dbWriter(data) {
+    var dbDate = data.expiryDate,
+        newDate = Obj.expiryDate;
+        console.log("dbWriter", dbDate, newDate);
+    if (newDate > dbDate) {
+        db["tweetImages"].insert(Obj);
+    }
+}
+//
 
 // ********************************************************** //
 // *** Setting up how the server treats incoming requests *** //
@@ -133,53 +163,13 @@ ig.use({
 
 
 
-// ************************************* \\
-// *** Setting up the twitter stream *** \\
-type = "statuses/filter",
-twitArray = [],
-trackParam = {
-    track: "foundersandcoders",    
-    filter: "images",
-    include_entities: true,
-    result_type: "recent"
-}
-// twit.stream(type, trackParam, function(stream) {
-//     stream.on("data", streamProcess);
-//     stream.on("error", errorThrower); 
-// });
-
-function streamProcess(tweet) {
-    streamObj = {
-        pic: tweet.entities.media[0].media_url_https,
-        link: tweets.entities.media[0].url,
-        user: tweets.user.name
-    }
-    console.log("Stream object", streamObj);
-    twitArray.unshift(streamObj);
-    while (twitArray.length > 30) {
-        twitArray.pop();
-    }
-    dataEmitter("tweet", streamObj)
-};
-
-function errorThrower(error) {
-    throw error;
-}
-
-// --- End setup of twitter stream --- \\
-// ----------------------------------- \\
-
-
-
 // ************************************** \\
 // *** Setting up the twitter request *** \\
-function twitterRequest(data, callback) {
-    twitObj = {
-        expiryDate: new Date(),
-        twArray: []
-    };
-    twitObjCreator(data);
-    return callback(searchObj.searchType, searchObj.searchParam, twitterProcess)
+function twitterRequest(data) {
+    twitSearchCreator(data);
+    alreadySearched(data);
+    console.log(searchObj.searchParam);
+    twit.get(searchObj.searchType, searchObj.searchParam, twitterProcess)
 }
 
 function twitSearchCreator(data) {
@@ -196,19 +186,17 @@ function twitSearchCreator(data) {
 }
 
 function twitterProcess(error, tweets, response) {
-    console.log(tweets.statuses[0].entities.media[0]);
     var temp;
     for (var i = 0; i < tweets.statuses.length; i++) {
         temp = {
             pic: tweets.statuses[i].entities.media[0].media_url_https,
             link: tweets.statuses[i].entities.media[0].url,
             user: tweets.statuses[i].user.name
-            // hashtags: tweets.statuses[i].entities.hashtags[0].text
         }
-        twitObj.twArray.unshift(temp);
+        Obj.twArray.unshift(temp);
     }
-    console.log(twitObj.twArray);
-    dataEmitter("twitPics", twitObj.twArray) 
+    dataEmitter("twitPics", Obj.twArray)
+    dbWriter(currentSearch); 
 }
 // -- End setup of the twitter request -- \\
 // -------------------------------------- \\
@@ -217,14 +205,10 @@ function twitterProcess(error, tweets, response) {
 
 // ************************************* \\
 // *** Setting up the #insta request *** \\
-function instaRequest(data, callback) {
+function instaRequest(data) {
     console.log("instaRequest received");
     var urld = urlify(data);
-    igObj = {
-        expiryDate: new Date(),
-        igArray: []    
-    };
-    return callback(urld, instaProcess);
+    ig.tag_media_recent(urld, instaProcess);
 }
 
 function instaProcess(err, medias, pagination, remaining, limit) {
@@ -234,11 +218,10 @@ function instaProcess(err, medias, pagination, remaining, limit) {
             pic: medias[i].images.standard_resolution.url,
             link: medias[i].link,
             user: medias[i].user.username
-            // hashtags: 
         }
-        igObj.igArray.unshift(temp);
+        Obj.igArray.unshift(temp);
     }
-    dataEmitter("instaPics", igObj.igArray)    
+    dataEmitter("instaPics", Obj.igArray)    
 }
 // ---- End setup of #insta request ---- \\
 // ------------------------------------ \\
@@ -249,19 +232,26 @@ function instaProcess(err, medias, pagination, remaining, limit) {
 // **** Socket.io stuffs ***** \\
 io.on("connection", function (socket) {
     console.log("Connected");
-    socket.emit("FreshTweets", twitArray);
+    // socket.emit("FreshTweets", twitArray);
     socket.on("picsPlease", picsPlease);
 });
 
 function picsPlease(data) {
-    searchTerm = data.textBox;
-    twitterRequest(data, twit.get);
-    instaRequest(data, ig.tag_media_recent);
+    searchTerm = data.textBox.toLowerCase();
+    console.log(searchTerm)
+    Obj = {
+        name: searchTerm,
+        expiryDate: new Date(),
+        twArray: [],
+        igArray: []
+    };
+    twitterRequest(searchTerm);
+    instaRequest(searchTerm);
 }
 
 function dataEmitter(type, contents) {
     io.emit("message", "Incoming" + type);
-    io.emit(type, contents)
+    io.emit(type, contents);
 }
 // --- End socket.io stuff --- \\
 // --------------------------- \\
@@ -275,3 +265,39 @@ console.log("Http server running on port" + " " + myPort);
 // ------- Here endeth the server ------- //
 // -------------------------------------- //
 
+
+// ************************************* \\
+// *** Setting up the twitter stream *** \\
+// type = "statuses/filter",
+// twitArray = [],
+// trackParam = {
+//     track: "foundersandcoders",    
+//     filter: "images",
+//     include_entities: true,
+//     result_type: "recent"
+// }
+// twit.stream(type, trackParam, function(stream) {
+//     stream.on("data", streamProcess);
+//     stream.on("error", errorThrower); 
+// });
+
+// function streamProcess(tweet) {
+//     streamObj = {
+//         pic: tweet.entities.media[0].media_url_https,
+//         link: tweets.entities.media[0].url,
+//         user: tweets.user.name
+//     }
+//     console.log("Stream object", streamObj);
+//     twitArray.unshift(streamObj);
+//     while (twitArray.length > 30) {
+//         twitArray.pop();
+//     }
+//     dataEmitter("tweet", streamObj)
+// };
+
+// function errorThrower(error) {
+//     throw error;
+// }
+
+// --- End setup of twitter stream --- \\
+// ----------------------------------- \\
