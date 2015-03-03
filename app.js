@@ -147,20 +147,20 @@ function existChecker (filePath, res, page404, mimeType) {
 // ***************************************************************** //
 // *** Setting up variables for the twit stream to el cliento si *** //
 twit = new Twitter({
-    consumer_key: 'U8N2QzFu6Hv4BB3BjObIy9HDF',
+    consumer_key: 
     // twit_ct || require("./confidential").ct,
-    consumer_secret: 'rJWtj5NneVWmfT8STB7YN6IBkLreke9JoJhP3nIe0ffnBq91Xv',
+    consumer_secret: 
     // twit_cs || require("./confidential").cs,
-    access_token_key: '2389016353-4tCDaVgRFkkNsWOj1sb6fZQ8s0bINqD5jJGmqRC',
+    access_token_key:
     // twit_atk || require("./confidential").atk,
-    access_token_secret: 'OEFnemh9FlSkOX5YuNP46XsDh3EutbHiiKq6q8wV2Pwko'
+    access_token_secret: 
     // twit_ats || require("./confidential").ats
 }); 
 
 ig.use({ 
-    client_id: 'd239fb3eff6c49fcaa1e35311e0fd2f1',
+    client_id: 
     // insta_ci || require("./confidential").ci,
-    client_secret: 'c0be3eef8a8047e79b403773c9824797'
+    client_secret: 
     // insta_cs || require("./confidential").cs
 });
 // --- End la setupa de la variablo del twit stream al clientissimo --- //
